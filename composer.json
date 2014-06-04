@@ -1,0 +1,26 @@
+{
+    "name": "phpixie/filesafe",
+    "description": "PHPixie library for safe using uploaded files",
+    "keywords": ["upload"],
+    "type": "library",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Mikhail Shevtsov",
+            "email": "mikhail.shevtsov@gmail.com",
+            "homepage": "http://about.me/m_shevtsov"
+        }
+    ],
+    "require": {
+        "phpixie/core": "2.*@dev",
+        "phpixie/image": "2.*@dev"
+    },
+    "autoload": {
+        "psr-0": {"PHPixie": "classes/"}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
+    }
+}
