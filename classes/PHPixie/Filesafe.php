@@ -36,22 +36,38 @@ class Filesafe {
 	// This method returns a ready url to a thumbnail image for using in <img> tag.
 	// It generates new image with configured parameters if it is not exist yet.
 	// Otherwise it is just returns url for previously generated thumbnail.
-	public function imageStyle($style, $subfolder, $filename) {
-		$path = $this->pixie->config->get("filesafe.path");
-		$edit = $this->pixie->config->get("filesafe.imagestyle.". $style);
+	public function imageStyle($style, $subfolder=null, $filename) {
+		$config = $this->pixie->config->get("filesafe");
 
-		$result = $path['allfiles'] .'/'. $style .'/'. $subfolder .'/'. $filename;
-
-		if(!file_exists($result)) {
-			$method = $edit['method'];
-			$image = $this->pixie->image->read($path['allfiles'] .'/'. $path['imagesources'] .'/'. $subfolder .'/'. $filename);
-			if(!file_exists($path['allfiles'] .'/'. $style .'/'. $subfolder))
-				mkdir($path['allfiles'] .'/'. $style .'/'. $subfolder, 0755, true);
-
-			$image->$method($edit['width'], $edit['height'])->save($path['allfiles'] .'/'. $style .'/'. $subfolder .'/'. $filename);
+		if($subfolder) {
+			$sourceFile = $this->pixie->image->read($config['path']['allfiles'] ."/". $config['path']['imagesources'] ."/{$subfolder}/{$filename}");
+			$targetFile = $config['path']['allfiles'] ."/{$style}/{$subfolder}/{$filename}";
+			if(!file_exists($config['path']['allfiles'] ."/{$style}/{$subfolder}"))
+				mkdir($config['path']['allfiles'] ."/{$style}/{$subfolder}", 0755, true);
 		}
-		return '/'. $result;
+		else {
+			$filename = ltrim($filename,"/");
+			$sourceFile = $this->pixie->image->read($filename);
+
+			$path_parts = pathinfo($filename);
+			if($newFilename = $this->makeUnique($path_parts['filename'], $path_parts['extension'], $config['path']['allfiles'] ."/thumbs/{$style}"))
+				$targetFile = $config['path']['allfiles'] ."/thumbs/{$style}/{$newFilename}.". $path_parts['extension'];
+			else
+				return false;
+
+			if(!file_exists($config['path']['allfiles'] ."/thumbs/{$style}"))
+				mkdir($config['path']['allfiles'] ."/thumbs/{$style}", 0755, true);
+		}
+
+
+		if(!file_exists($targetFile)) {
+			$method = $config['imagestyle'][$style]['method'];
+			$sourceFile->$method($config['imagestyle'][$style]['width'], $config['imagestyle'][$style]['height'])->save($targetFile);
+		}
+
+		return '/'. $targetFile;
 	}
+
 
 	// Checking and accepting uploaded file
 	// $name - name of element of global array $_FILES
