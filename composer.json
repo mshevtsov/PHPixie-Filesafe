@@ -3,7 +3,7 @@
     "description": "PHPixie library for safe using uploaded files",
     "keywords": ["upload"],
     "type": "library",
-    "license": "BSD",
+    "license": "MIT",
     "authors": [
         {
             "name": "Mikhail Shevtsov",
