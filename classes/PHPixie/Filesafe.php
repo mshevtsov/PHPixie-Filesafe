@@ -222,13 +222,13 @@ class Filesafe {
 			$info = curl_getinfo($ch);
 			$headers = array_filter(explode("\r\n", substr($response, 0, $header_size)));
 
-			if(false === $ext=array_search($info["content_type"],$config['type']['document'],true))
+			if(false === $ext=array_search($info["content_type"],$config['type']['image'],true))
 				return -2;
 
 			if(!$info["size_download"] || $info["size_download"]>$config['size']['max'])
 				return -3;
 
-			$filename = basename($this->request->post('link'));
+			$filename = basename($url);
 			foreach($headers as $line) {
 				if(!strpos($line, ": "))
 					continue;
