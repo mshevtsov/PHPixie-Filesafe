@@ -202,6 +202,70 @@ class Filesafe {
 
 
 
+	
+	public function getRemoteImage($url, $subfolder=null) {
+		$config = $this->pixie->config->get("filesafe");
+
+		try {
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_VERBOSE, 1);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+			$response = curl_exec($ch);
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+			if($httpCode!=200)
+				return -1;
+
+			$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+			$info = curl_getinfo($ch);
+			$headers = array_filter(explode("\r\n", substr($response, 0, $header_size)));
+
+			if(false === $ext=array_search($info["content_type"],$config['type']['document'],true))
+				return -2;
+
+			if(!$info["size_download"] || $info["size_download"]>$config['size']['max'])
+				return -3;
+
+			$filename = basename($this->request->post('link'));
+			foreach($headers as $line) {
+				if(!strpos($line, ": "))
+					continue;
+				[$key,$value] = explode(": ", trim($line));
+				if(strtolower($key)=="content-disposition") {
+					if(preg_match("/filename=['\"](.+)['\"]/", $value, $matches))
+						$filename = $matches[1];
+				}
+			}
+
+			$body = substr($response, $header_size);
+			curl_close($ch);
+
+
+			$newpath = $config['path']['allfiles'] ."/". $config['path']['imagesources'] ."/". ($subfolder ? "{$subfolder}/" : "");
+			$filename = substr($filename, 0, 255);
+			$filename = strstr($filename, ".", true);
+			$filename = $this->transliterate($filename);
+			if(!$filename = $this->makeUnique($filename, $ext, $newpath))
+				throw new Exception('Too many files with same name uploaded.');
+			$filename .= '.'. $ext;
+
+			$fp = fopen($newpath . $filename, 'wb');
+			fwrite($fp, $body);
+			fclose($fp);
+
+			return $filename;
+
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}
+
+		return 0;
+	}
+
+
+	
 
 
 
