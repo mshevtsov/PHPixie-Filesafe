@@ -72,7 +72,7 @@ class Filesafe {
 	// Checking and accepting uploaded file
 	// $name - name of element of global array $_FILES
 	// $subfolder - subfolder of folder for all uploaded files where the file should be moved
-	public function getFileImage($name, $subfolder) {
+	public function getFileImage($name, $subfolder=null) {
 		$config = $this->pixie->config->get("filesafe");
 
 		try {
@@ -108,7 +108,7 @@ class Filesafe {
 				throw new Exception('Invalid file format.');
 			}
 
-			$newpath = $config['path']['allfiles'] ."/". $config['path']['imagesources'] ."/". $subfolder ."/";
+			$newpath = $config['path']['allfiles'] ."/". $config['path']['imagesources'] ."/". ($subfolder ? "{$subfolder}/" : "");
 			$filename = $_FILES[$name]['name'];
 			$filename = substr($filename, 0, 255);
 			$filename = strstr($filename, ".", true);
@@ -136,7 +136,7 @@ class Filesafe {
 
 
 
-	public function getFileGeneral($name, $subfolder) {
+	public function getFileGeneral($name, $subfolder=null) {
 		$config = $this->pixie->config->get("filesafe");
 
 		try {
@@ -172,7 +172,7 @@ class Filesafe {
 				throw new \Exception('Invalid file format.');
 			}
 
-			$newpath = $config['path']['allfiles'] ."/". $config['path']['documents'] ."/". $subfolder ."/";
+			$newpath = $config['path']['allfiles'] ."/". $config['path']['documents'] ."/". ($subfolder ? "{$subfolder}/" : "");
 
 			if(!file_exists($newpath)) {
 				mkdir($newpath, 0775, true);
