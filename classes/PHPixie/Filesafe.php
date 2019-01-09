@@ -216,7 +216,7 @@ class Filesafe {
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 			if($httpCode!=200)
-				return -1;
+				return -$httpCode;
 
 			$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 			$info = curl_getinfo($ch);
