@@ -337,7 +337,7 @@ class Filesafe {
 			" "=> "-", "."=> "", "/"=> "-", "\\"=> "-"
 		);
 		$str = preg_replace('/[^A-Za-z0-9_\-]/', '', strtr($str,$tr));
-		$str = strtolower($str);
+		$str = mb_strtolower($str);
 		$str = trim($str, "-");
 		return $str;
 	}
